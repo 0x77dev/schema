@@ -236,7 +236,9 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
-  extendEdge?: (def: ObjectDefinitionBlock<any>) => void
+  extendEdge?: (
+    def: ObjectDefinitionBlock<FieldTypeName<FieldTypeName<TypeName, FieldName>, 'edges'>>
+  ) => void
   /**
    * Configures the default "nonNullDefaults" for connection type generated
    * for this connection
@@ -331,7 +333,7 @@ function base64Decode(str: string) {
 }
 
 export type EdgeFieldResolver<TypeName extends string, FieldName extends string, EdgeField extends string> = (
-  root: RootValue<TypeName>,
+  root: RootValue<FieldTypeName<FieldTypeName<TypeName, FieldName>, 'edges'>>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
@@ -392,7 +394,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
         eachObj(pluginExtendConnection, (val, key) => {
           dynamicConfig.push(
             `${key}${
-              val.requireResolver ? ':' : '?:'
+              val.requireResolver === false ? '?:' : ':'
             } core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`
           )
         })
@@ -403,7 +405,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
           pluginExtendEdge,
           (val, key) =>
             `${key}${
-              val.requireResolver ? ':' : '?:'
+              val.requireResolver === false ? '?:' : ':'
             } connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, "${key}">`
         )
         dynamicConfig.push(`edgeFields: { ${edgeFields.join(', ')} }`)
