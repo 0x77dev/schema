@@ -247,7 +247,10 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   /**
    * Allows specifying a custom cursor type, as the name of a scalar
    */
-  cursorType?: GetGen<'scalarNames'> | NexusNullDef<GetGen<'scalarNames'>>
+  cursorType?:
+    | GetGen<'scalarNames'>
+    | NexusNullDef<GetGen<'scalarNames'>>
+    | NexusNonNullDef<GetGen<'scalarNames'>>
   /**
    * Defined if you have extended the connectionPlugin globally
    */
